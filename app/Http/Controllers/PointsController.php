@@ -22,7 +22,7 @@ class PointsController extends Controller
             'title' => 'Map',
         ];
 
-        return view ('map', $data);
+        return view('map', $data);
     }
 
     /**
@@ -38,18 +38,34 @@ class PointsController extends Controller
      */
     public function store(Request $request)
     {
+        //Validation
+        $request->validate(
+            [
+                'name' => 'required|unique:points,name',
+                'description' => 'required',
+                'geom_points' => 'required',
+            ],
+            [
+                'name.required' => 'Name is required',
+                'name.unique' => 'Name already exists',
+                'description.required' => 'Description is required',
+                'geom_points.required' => 'Location is required',
+            ]
+        );
+
         $data = [
-            'geom' => $request->geom_point,
+            'geom' => $request->geom_points,
             'name' => $request->name,
             'description' => $request->description,
         ];
 
-        //create data
-        $this->points->insert($data);
+        //Create Data
+        if (!$this->points->create($data)) {
+            return redirect()->route('map')->with('error', 'Point Failed to add');
+        }
 
-        //redirect data
-        return redirect()->route('map');
-
+        //Redirect to map
+        return redirect()->route('map')->with('success', 'Point has been added');
     }
 
     /**
