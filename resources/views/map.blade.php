@@ -26,7 +26,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form method="POST" action="{{ route('points.store') }}">
+                <form method="POST" action="{{ route('points.store') }}" enctype="multipart/form-data">
                     <div class="modal-body">
                         @csrf
                         <div class="mb-3">
@@ -42,6 +42,15 @@
                         <div class="mb-3">
                             <label for="geom_poinst" class="form-label">Geometry</label>
                             <textarea class="form-control" id="geom_points" name="geom_points" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Photo</label>
+                            <input type="file" class="form-control" id="image_point" name="image"
+                                onchange="document.getElementById('preview-image-point').src = window.URL.createObjectURL(this.files[0])">
+                            <img src="" alt="Preview" id="preview-image-point"
+                                class="img-thumbnail mx-auto d-block"
+                                style="max-width: 100%; height: auto; max-height: 400px;">
                         </div>
 
                     </div>
@@ -63,7 +72,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form method="POST" action="{{ route('polylines.store') }}">
+                <form method="POST" action="{{ route('polylines.store') }} "enctype="multipart/form-data">
                     <div class="modal-body">
                         @csrf
                         <div class="mb-3">
@@ -81,6 +90,15 @@
                             <textarea class="form-control" id="geom_polylines" name="geom_polylines" rows="3"></textarea>
                         </div>
 
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Photo</label>
+                            <input type="file" class="form-control" id="image_polylines" name="image"
+                                onchange="document.getElementById('preview-image-polylines').src = window.URL.createObjectURL(this.files[0])">
+                            <img src="" alt="Preview" id="preview-image-polylines"
+                                class="img-thumbnail mx-auto d-block"
+                                style="max-width: 100%; height: auto; max-height: 400px;">
+                        </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -92,7 +110,8 @@
     </div>
 
     <!-- Modal Create Polygon-->
-    <div class="modal fade" id="createpolygonsModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="createpolygonsModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -100,7 +119,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form method="POST" action="{{ route('polygons.store') }}">
+                <form method="POST" action="{{ route('polygons.store') }}"enctype="multipart/form-data" >
                     <div class="modal-body">
                         @csrf
                         <div class="mb-3">
@@ -116,6 +135,14 @@
                         <div class="mb-3">
                             <label for="geom_polygons" class="form-label">Geometry</label>
                             <textarea class="form-control" id="geom_polygons" name="geom_polygons" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Photo</label>
+                            <input type="file" class="form-control" id="image_polygons" name="image"
+                                onchange="document.getElementById('preview-image-polygons').src = window.URL.createObjectURL(this.files[0])">
+                            <img src="" alt="Preview" id="preview-image-polygons"
+                                class="img-thumbnail mx-auto d-block"
+                                style="max-width: 100%; height: auto; max-height: 400px;">
                         </div>
 
                     </div>
@@ -206,15 +233,41 @@
         //GeoJSON Points
         var point = L.geoJson(null, {
             onEachFeature: function(feature, layer) {
-                var popupContent = "Nama: " + feature.properties.name + "<br>" +
-                    "Deskripsi: " + feature.properties.description + "<br>" +
-                    "Dibuat: " + feature.properties.created_at;
+                var popupContent = `
+            <table style="border-collapse: collapse; width: 100%; text-align: left; border: 1px solid black;">
+                <thead>
+                    <tr style="background-color: #FFB100; color: white;">
+                        <th style="padding: 5px; border: 1px solid black;" colspan="2">Informasi Titik</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Nama</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.name}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Deskripsi</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.description}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Dibuat</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.created_at}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Gambar</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">
+                        <img src="/storage/images/${feature.properties.image}" width="200" alt=''>
+                         </td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
                 layer.on({
                     click: function(e) {
-                        point.bindPopup(popupContent);
+                        layer.bindPopup(popupContent);
                     },
                     mouseover: function(e) {
-                        point.bindTooltip(feature.properties.name);
+                        layer.bindTooltip(feature.properties.name);
                     },
                 });
             },
@@ -227,15 +280,40 @@
         //GeoJSON Polylines
         var polyline = L.geoJson(null, {
             onEachFeature: function(feature, layer) {
-                var popupContent = "Nama: " + feature.properties.name + "<br>" +
-                    "Panjang: " + feature.properties.length_km.toFixed(2) + "km<br>" +
-                    "Dibuat: " + feature.properties.created_at;
+                var popupContent = `
+            <table style="border-collapse: collapse; width: 100%; text-align: left; border: 1px solid black;">
+                <thead>
+                    <tr style="background-color: #FFB100; color: white;">
+                        <th style="padding: 5px; border: 1px solid black;" colspan="2">Informasi Garis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Nama</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.name}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Panjang</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.length_km.toFixed(2)} km</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Dibuat</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.created_at}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Gambar</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">
+                        <img src="/storage/images/${feature.properties.image}" width="200" alt=''></td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
                 layer.on({
                     click: function(e) {
-                        polyline.bindPopup(popupContent);
+                        layer.bindPopup(popupContent);
                     },
                     mouseover: function(e) {
-                        polyline.bindTooltip(feature.properties.name);
+                        layer.bindTooltip(feature.properties.name);
                     },
                 });
             },
@@ -248,16 +326,44 @@
         //GeoJSON Polygon
         var polygon = L.geoJson(null, {
             onEachFeature: function(feature, layer) {
-                var popupContent = "Nama: " + feature.properties.name + "<br>" +
-                    "Deskripsi: " + feature.properties.description + "<br>" +
-                    "Luas: " + feature.properties.luas_hektar.toFixed(2) + " hektar" + "<br>" +
-                    "Dibuat: " + feature.properties.created_at;
+                var popupContent = `
+            <table style="border-collapse: collapse; width: 100%; text-align: left; border: 1px solid black;">
+                <thead>
+                    <tr style="background-color: #FFB100; color: white;">
+                        <th style="padding: 5px; border: 1px solid black;" colspan="2">Informasi Poligon</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Nama</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.name}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Deskripsi</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.description}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Luas</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.luas_hektar.toFixed(2)} hektar</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Dibuat</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.created_at}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Gambar</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">
+                        <img src="/storage/images/${feature.properties.image}" width="200" alt=''></td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
                 layer.on({
                     click: function(e) {
-                        polygon.bindPopup(popupContent);
+                        layer.bindPopup(popupContent);
                     },
                     mouseover: function(e) {
-                        polygon.bindTooltip(feature.properties.name);
+                        layer.bindTooltip(feature.properties.name);
                     },
                 });
             },
