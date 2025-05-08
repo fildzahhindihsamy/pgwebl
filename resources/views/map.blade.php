@@ -26,7 +26,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form method="POST" action="{{ route('points.store') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('points.store') }}"enctype="multipart/form-data">
                     <div class="modal-body">
                         @csrf
                         <div class="mb-3">
@@ -119,7 +119,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form method="POST" action="{{ route('polygons.store') }}"enctype="multipart/form-data" >
+                <form method="POST" action="{{ route('polygons.store') }}"enctype="multipart/form-data">
                     <div class="modal-body">
                         @csrf
                         <div class="mb-3">
@@ -139,7 +139,8 @@
                         <div class="mb-3">
                             <label for="image" class="form-label">Photo</label>
                             <input type="file" class="form-control" id="image_polygons" name="image"
-                                onchange="document.getElementById('preview-image-polygons').src = window.URL.createObjectURL(this.files[0])">
+                                onchange="document.getElementById('preview-image-polygons').
+                                src = window.URL.createObjectURL(this.files[0])">
                             <img src="" alt="Preview" id="preview-image-polygons"
                                 class="img-thumbnail mx-auto d-block"
                                 style="max-width: 100%; height: auto; max-height: 400px;">
@@ -261,6 +262,15 @@
                     </tr>
                 </tbody>
             </table>
+        <div style="text-align: center; margin-top: 10px;">
+            <form method="POST" action="{{ url('points') }}/${feature.properties.id}" onclick="return confirm('BENERAN TITIKNYA MAU DIHAPUSSSS????')">
+                <input type="hidden" name="_method" value="DELETE">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-danger">
+                    <i class="fa-solid fa-trash-can"></i> Hapus
+                </button>
+            </form>
+        </div>
         `;
                 layer.on({
                     click: function(e) {
@@ -307,6 +317,15 @@
                     </tr>
                 </tbody>
             </table>
+        <div style="text-align: center; margin-top: 10px;">
+            <form method="POST" action="{{ url('polylines') }}/${feature.properties.id}" onclick="return confirm('BENERAN GARISNYA MAU DIHAPUSSSS????')">
+                <input type="hidden" name="_method" value="DELETE">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-danger">
+                    <i class="fa-solid fa-trash-can"></i> Hapus
+                </button>
+            </form>
+        </div>
         `;
                 layer.on({
                     click: function(e) {
@@ -357,6 +376,15 @@
                     </tr>
                 </tbody>
             </table>
+            <div style="text-align: center; margin-top: 10px;">
+            <form method="POST" action="{{ url('polygons') }}/${feature.properties.id}" onclick="return confirm('BENERAN AREANYA MAU DIHAPUSSSS????')">
+                <input type="hidden" name="_method" value="DELETE">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-danger">
+                    <i class="fa-solid fa-trash-can"></i> Hapus
+                </button>
+            </form>
+        </div>
         `;
                 layer.on({
                     click: function(e) {
