@@ -16,7 +16,11 @@ class PolygonsController extends Controller
      */
     public function index()
     {
-        //
+        $data = [
+            'title' => 'Map',
+        ];
+
+        return view('map', $data);
     }
 
     /**
@@ -56,7 +60,8 @@ class PolygonsController extends Controller
         //Get image file
          if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $name_image = time() . "_polygons." . strtolower($image->getClientOriginalExtension());
+            $name_image = time() . "_polygons." . strtolower
+            ($image->getClientOriginalExtension());
             $image->move('storage/images', $name_image);
           } else {
             $name_image = null;
@@ -92,7 +97,12 @@ class PolygonsController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $data = [
+            'title' => 'Edit Polygon',
+            'id' => $id,
+        ];
+
+        return view('edit-polygon', $data);
     }
 
     /**
@@ -100,7 +110,62 @@ class PolygonsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        //Validation
+        $request->validate(
+            [
+                'name' => 'required|unique:polygons,name,' . $id,
+                'description' => 'required',
+                'geom_polygons' => 'required',
+                'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,svg|max:3000',
+            ],
+            [
+                'name.required' => 'Name is required',
+                'name.unique' => 'Name already exists',
+                'description.required' => 'Description is required',
+                'geom_polygons.required' => 'Location is required',
+            ]
+        );
+
+        //Create directory
+        if (!is_dir('storage/images')) {
+            mkdir('./storage/images', 0777);
+         }
+
+         // Get old image file name
+        $old_image = $this->polygons->find($id)->image;
+        //dd($old_image);
+
+        //Get image file
+         if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $name_image = time() . "_polygon." . strtolower
+            ($image->getClientOriginalExtension());
+            $image->move('storage/images', $name_image);
+
+        // Delete old image file
+        if ($old_image != null) {
+            if (file_exists('./storage/images/' . $old_image)) {
+                unlink('./storage/images/' . $old_image);
+            }
+        }
+          } else {
+            $name_image = $old_image;
+          }
+
+        $data = [
+            'geom' => $request->geom_polygons,
+            'name' => $request->name,
+            'description' => $request->description,
+            'image' => $name_image,
+        ];
+
+        //Update Data
+        if (!$this->polygons->find($id)->update($data)) {
+            return redirect()->route('map')->with('error', 'Polygon Failed to update');
+        }
+
+        //Redirect to map
+        return redirect()->route('map')->with('success', 'Polygon has been updated');
     }
 
     /**

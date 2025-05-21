@@ -10,7 +10,7 @@ class PointsController extends Controller
 
     public function __construct()
     {
-        $this->points = new PointsModel;
+        $this->points = new PointsModel();
     }
 
     /**
@@ -45,7 +45,6 @@ class PointsController extends Controller
                 'description' => 'required',
                 'geom_points' => 'required',
                 'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,svg|max:3000',
-
             ],
             [
                 'name.required' => 'Name is required',
@@ -55,7 +54,7 @@ class PointsController extends Controller
             ]
         );
 
-        //Create directory
+        //Create image directory if not exists
         if (!is_dir('storage/images')) {
             mkdir('./storage/images', 0777);
          }
@@ -63,7 +62,8 @@ class PointsController extends Controller
         //Get image file
          if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $name_image = time() . "_point." . strtolower($image->getClientOriginalExtension());
+            $name_image = time() . "_point." . strtolower
+            ($image->getClientOriginalExtension());
             $image->move('storage/images', $name_image);
           } else {
             $name_image = null;
@@ -75,7 +75,6 @@ class PointsController extends Controller
             'description' => $request->description,
             'image' => $name_image,
         ];
-
 
         //Create Data
         if (!$this->points->create($data)) {
@@ -99,7 +98,12 @@ class PointsController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $data = [
+            'title' => 'Edit Point',
+            'id' => $id,
+        ];
+
+        return view('edit-point', $data);
     }
 
     /**
@@ -107,7 +111,64 @@ class PointsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        //dd($id, $request->all());
+        //Validation
+        $request->validate(
+            [
+                'name' => 'required|unique:points,name,' . $id,
+                'description' => 'required',
+                'geom_points' => 'required',
+                'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,svg|max:3000',
+            ],
+            [
+                'name.required' => 'Name is required',
+                'name.unique' => 'Name already exists',
+                'description.required' => 'Description is required',
+                'geom_points.required' => 'Location is required',
+            ]
+        );
+
+        //Create directory
+        if (!is_dir('storage/images')) {
+            mkdir('./storage/images', 0777, true);
+         }
+
+         // Get old image file name
+        $old_image = $this->points->find($id)->image;
+        //dd($old_image);
+
+        //Get image file
+         if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $name_image = time() . "_point." . strtolower($image->getClientOriginalExtension());
+            $image->move('storage/images', $name_image);
+
+
+
+        // Delete old image file
+            if ($old_image != null) {
+                if (file_exists('./storage/images/' . $old_image)) {
+                    unlink('./storage/images/' . $old_image);
+                }
+            }
+          } else {
+            $name_image = $old_image;
+          }
+
+            $data = [
+                'geom' => $request->geom_points,
+                'name' => $request->name,
+                'description' => $request->description,
+                'image' => $name_image,
+            ];
+
+        //Update Data
+        if (!$this->points->find($id)->update($data)) {
+            return redirect()->route('map')->with('error', 'Point Failed to update');
+        }
+
+        //Redirect to map
+        return redirect()->route('map')->with('success', 'Point has been updated');
     }
 
     /**
