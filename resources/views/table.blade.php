@@ -11,6 +11,7 @@
             <th>Image</th>
             <th>Created At</th>
             <th>Updated At</th>
+            <th>Dibuat Oleh</th>
         </tr>
     </thead>
     <tbody>
@@ -25,6 +26,7 @@
                     </td>
                     <td>{{ $p->created_at }}</td>
                     <td>{{ $p->updated_at }}</td>
+                    <td>{{ $p->user_name }}</td>
                 </tr>
             @endforeach
         </tbody>

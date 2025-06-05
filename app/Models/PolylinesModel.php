@@ -14,13 +14,16 @@ class PolylinesModel extends Model
     public function geojson_polylines()
     {
         $polylines = DB::table($this->table)
-            ->selectRaw('id, ST_AsGeoJSON(geom) as geom,
-            name, description,
-            ST_Length(geography(geom)) as length_m,
-            ST_Length(geography(geom)) / 1000 as length_km,
-            created_at,
-            updated_at,
-            image')
+            ->selectRaw('polylines.id, ST_AsGeoJSON(polylines.geom) as geom,
+                polylines.name, polylines.description,
+                ST_Length(geography(polylines.geom)) as length_m,
+                ST_Length(geography(polylines.geom)) / 1000 as length_km,
+                polylines.created_at,
+                polylines.updated_at,
+                polylines.image,
+                polylines.user_id,
+                users.name as user_name')
+            ->leftJoin('users', 'polylines.user_id', '=', 'users.id')
             ->get();
 
         $geojson = [
@@ -40,7 +43,9 @@ class PolylinesModel extends Model
                     'length_km' => $p->length_km,
                     'created_at' => $p->created_at,
                     'updated_at' => $p->updated_at,
-                    'image' => $p->image
+                    'image' => $p->image,
+                    'user_id' => $p->user_id,
+                    'user_name' => $p->user_name,
                 ],
             ];
 
@@ -49,17 +54,22 @@ class PolylinesModel extends Model
 
         return $geojson;
     }
+
     public function geojson_polyline($id)
     {
         $polylines = DB::table($this->table)
-            ->selectRaw('id, ST_AsGeoJSON(geom) as geom,
-            name, description,
-            ST_Length(geography(geom)) as length_m,
-            ST_Length(geography(geom)) / 1000 as length_km,
-            created_at,
-            updated_at,
-            image')
-            ->where('id', $id)
+            ->selectRaw('polylines.id, ST_AsGeoJSON(polylines.geom) as geom,
+                polylines.name, polylines.description,
+                ST_Length(geography(polylines.geom)) as length_m,
+                ST_Length(geography(polylines.geom)) / 1000 as length_km,
+                polylines.created_at,
+                polylines.updated_at,
+                polylines.image,
+                polylines.user_id,
+                users.created_at as user_created_at,
+                users.name as user_name')
+            ->where('polylines.id', $id)
+            ->leftJoin('users', 'polylines.user_id', '=', 'users.id')
             ->get();
 
         $geojson = [
@@ -79,7 +89,10 @@ class PolylinesModel extends Model
                     'length_km' => $p->length_km,
                     'created_at' => $p->created_at,
                     'updated_at' => $p->updated_at,
-                    'image' => $p->image
+                    'image' => $p->image,
+                    'user_id' => $p->user_id,
+                    'user_created_at' => $p->user_created_at,
+                    'user_name' => $p->user_name,
                 ],
             ];
 

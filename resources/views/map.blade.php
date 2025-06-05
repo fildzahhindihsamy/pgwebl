@@ -258,6 +258,10 @@ var point = L.geoJson(null, {
                         <td style="padding: 5px; border: 1px solid black;">${feature.properties.description}</td>
                     </tr>
                     <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Dibuat oleh</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.user_name}</td>
+                    </tr>
+                    <tr>
                         <td style="padding: 5px; border: 1px solid black;"><b>Dibuat</b></td>
                         <td style="padding: 5px; border: 1px solid black;">${feature.properties.created_at}</td>
                     </tr>
@@ -315,6 +319,14 @@ $.getJSON("{{ route('api.points') }}", function(data) {
                     <tr>
                         <td style="padding: 5px; border: 1px solid black;"><b>Nama</b></td>
                         <td style="padding: 5px; border: 1px solid black;">${feature.properties.name}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Deskripsi</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.description}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Dibuat oleh</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.user_name}</td>
                     </tr>
                     <tr>
                         <td style="padding: 5px; border: 1px solid black;"><b>Panjang</b></td>
@@ -378,6 +390,10 @@ $.getJSON("{{ route('api.points') }}", function(data) {
                     <tr>
                         <td style="padding: 5px; border: 1px solid black;"><b>Deskripsi</b></td>
                         <td style="padding: 5px; border: 1px solid black;">${feature.properties.description}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid black;"><b>Dibuat oleh</b></td>
+                        <td style="padding: 5px; border: 1px solid black;">${feature.properties.user_name}</td>
                     </tr>
                     <tr>
                         <td style="padding: 5px; border: 1px solid black;"><b>Luas</b></td>
